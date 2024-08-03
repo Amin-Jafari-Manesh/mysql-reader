@@ -1,0 +1,9 @@
+certifi==2024.7.4
+elastic-transport==8.13.1
+elasticsearch==8.14.0
+greenlet==3.0.3
+mysql-connector-python==9.0.0
+PyMySQL==1.1.1
+SQLAlchemy==2.0.31
+typing_extensions==4.12.2
+urllib3==2.2.2
