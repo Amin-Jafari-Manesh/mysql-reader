@@ -14,7 +14,7 @@ metadata = MetaData()
 
 hashes = Table('hashes', metadata,
                Column('id', Integer, primary_key=True),
-               Column('hash', String(640000), unique=True),
+               Column('hash', String(64)),
                Column('created_at', DateTime, default=datetime.now)
                )
 
@@ -62,4 +62,7 @@ def mysql_write_hash(size: int = 100) -> bool:
 
 
 if __name__ == '__main__':
-    mysql_write_hash(db_config['RECORDS'])
+    if mysql_write_hash(db_config['RECORDS']):
+        logging.info("Hashes successfully written to the database.")
+    else:
+        logging.error("Failed to write hashes to the database.")
