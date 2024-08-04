@@ -4,7 +4,6 @@ from os import environ
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
 import mysql.connector
 
-
 db_config = {
     'PASS': environ.get('PASS', ''),
     'DOMAIN': environ.get('DOMAIN', ''),
@@ -15,7 +14,7 @@ metadata = MetaData()
 
 hashes = Table('hashes', metadata,
                Column('id', Integer, primary_key=True),
-               Column('hash', String(64), unique=True),
+               Column('hash', String(640000), unique=True),
                Column('created_at', DateTime, default=datetime.now)
                )
 
@@ -60,6 +59,7 @@ def mysql_write_hash(size: int = 100) -> bool:
         connection.close()
         return True
     return False
+
 
 if __name__ == '__main__':
     mysql_write_hash(db_config['RECORDS'])
