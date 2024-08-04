@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 from os import environ
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
 import mysql.connector
 
 logging.basicConfig(level=logging.INFO)
@@ -12,13 +11,6 @@ db_config = {
     'HASH_SIZE': int(environ.get('HASH_SIZE', '')),
     'RECORDS': int(environ.get('RECORDS', '')),
 }
-metadata = MetaData()
-
-hashes = Table('hashes', metadata,
-               Column('id', Integer, primary_key=True),
-               Column('hash', String(128 * db_config['HASH_SIZE'])),
-               Column('created_at', DateTime, default=datetime.now)
-               )
 
 
 def generate_random_hash(numb: int = 1) -> str:
@@ -43,6 +35,8 @@ def test_mysql_connection():
             port='3306'
         )
         logging.info("Successfully connected to MySQL")
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE hashes (id INT AUTO_INCREMENT PRIMARY KEY, hash VARCHAR(65535), created_at TIMESTAMP)")
         conn.close()
         return True
     except Exception as e:
@@ -52,13 +46,18 @@ def test_mysql_connection():
 
 def mysql_write_hash(size: int = 100) -> bool:
     if test_mysql_connection():
-        mysql_uri = f"mysql+pymysql://admin:{db_config['PASS']}@{db_config['DOMAIN']}:3306/db"
-        engine = create_engine(mysql_uri)
-        connection = engine.connect()
-        metadata.create_all(engine)
+        conn = mysql.connector.connect(
+            host=db_config['DOMAIN'],
+            user='admin',
+            password=db_config['PASS'],
+            database='db',
+            port='3306'
+        )
+        cur = conn.cursor()
         for _ in range(size):
-            connection.execute(hashes.insert().values(hash=generate_random_hash(db_config['HASH_SIZE'])))
-        connection.close()
+            cur.execute(f"INSERT INTO hashes (hash, created_at) VALUES ('{generate_random_hash(db_config['HASH_SIZE'])}', '{datetime.now()}')")
+        conn.commit()
+        conn.close()
         return True
     return False
 
