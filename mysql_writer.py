@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+import time
 from os import environ
 import mysql.connector
 
@@ -10,6 +11,7 @@ db_config = {
     'DOMAIN': environ.get('DOMAIN', ''),
     'HASH_SIZE': int(environ.get('HASH_SIZE', '')),
     'RECORDS': int(environ.get('RECORDS', '')),
+    'INSERT_DELAY' : int(environ.get('INSERT_DELAY', '')),
 }
 
 
@@ -56,6 +58,7 @@ def mysql_write_hash(size: int = 100) -> bool:
         )
         cur = conn.cursor()
         for _ in range(size):
+            time.sleep(db_config['INSERT_DELAY']*0.001)
             cur.execute(f"INSERT INTO hashes (hash, created_at) VALUES ('{generate_random_hash(db_config['HASH_SIZE'])}', '{datetime.now()}')")
             conn.commit()
         conn.close()

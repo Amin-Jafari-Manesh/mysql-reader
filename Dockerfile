@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM hub.hamdocker.ir/library/python:3.10-slim-bullseye
 
 # Set environment variables
 
@@ -32,6 +32,6 @@ COPY --chown=app:app ./requirements.txt .
 RUN pip install --no-cache-dir --upgrade -r /home/app/requirements.txt
 
 # copy project
-COPY --chown=app:app * /home/app/
+COPY --chown=app:app . /home/app/
 
 CMD ["python","/home/app/mysql_writer.py"]
