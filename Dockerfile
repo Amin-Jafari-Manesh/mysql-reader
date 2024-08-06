@@ -1,4 +1,4 @@
-FROM hub.hamdocker.ir/library/python:3.10-slim-bullseye
+FROM python:3.10-slim-bullseye
 
 # Set environment variables
 
