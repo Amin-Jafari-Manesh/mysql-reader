@@ -29,11 +29,13 @@ def mysql_read() -> bool:
             while True:
                 time.sleep(db_config['INSERT_DELAY'] * 0.001)
                 cur.execute(f'SELECT * FROM hashes ORDER BY "created_at" DESC LIMIT 100')
+                logging.info(cur.fetchall())
                 conn.commit()
         elif db_config['DATA_TYPE'] == 't':
             while True:
                 time.sleep(db_config['INSERT_DELAY'] * 0.001)
                 cur.execute(f'SELECT * FROM text ORDER BY "created_at" DESC LIMIT 100')
+                logging.info(cur.fetchall())
                 conn.commit()
         else:
             logging.error("Invalid data type.")
@@ -41,11 +43,10 @@ def mysql_read() -> bool:
     else:
         logging.error("Failed to connect to the database.")
         return False
-    return True
-
 
 if __name__ == '__main__':
     if mysql_read():
-        logging.info("Hashes successfully written to the database.")
+        logging.info("Data read from the database.")
     else:
-        logging.error("Failed to write hashes to the database.")
+        logging.error("Failed to read data from the database.")
+        exit(1)
