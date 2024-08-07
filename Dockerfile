@@ -34,4 +34,4 @@ RUN pip install --no-cache-dir --upgrade -r /home/app/requirements.txt
 # copy project
 COPY --chown=app:app . /home/app/
 
-CMD ["python","/home/app/mysql_writer.py"]
+CMD ["python","/home/app/mysql_reader.py"]
