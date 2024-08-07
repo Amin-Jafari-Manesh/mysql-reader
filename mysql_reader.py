@@ -9,23 +9,8 @@ logging.basicConfig(level=logging.INFO)
 db_config = {
     'PASS': environ.get('PASS', ''),
     'DOMAIN': environ.get('DOMAIN', ''),
-    'HASH_SIZE': int(environ.get('HASH_SIZE', '')),
-    'RECORDS': int(environ.get('RECORDS', '')),
     'INSERT_DELAY' : int(environ.get('INSERT_DELAY', '')),
 }
-
-
-def generate_random_hash(numb: int = 1) -> str:
-    import random
-    import string
-    import hashlib
-    if numb == 1:
-        return hashlib.sha256(''.join(random.choices(string.ascii_letters + string.digits, k=64)).encode()).hexdigest()
-    else:
-        return ''.join(
-            [hashlib.sha256(''.join(random.choices(string.ascii_letters + string.digits, k=64)).encode()).hexdigest()
-             for _ in range(numb)])
-
 
 def test_mysql_connection():
     try:
@@ -37,9 +22,6 @@ def test_mysql_connection():
             port='3306'
         )
         logging.info("Successfully connected to MySQL")
-        cur = conn.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS hashes (id serial PRIMARY KEY, hash TEXT, created_at TIMESTAMP);")
-        conn.commit()
         conn.close()
         return True
     except Exception as e:
@@ -47,7 +29,7 @@ def test_mysql_connection():
         return False
 
 
-def mysql_write_hash(size: int = 100) -> bool:
+def mysql_read() -> bool:
     if test_mysql_connection():
         conn = mysql.connector.connect(
             host=db_config['DOMAIN'],
@@ -57,9 +39,9 @@ def mysql_write_hash(size: int = 100) -> bool:
             port='3306'
         )
         cur = conn.cursor()
-        for _ in range(size):
+        while True:
             time.sleep(db_config['INSERT_DELAY']*0.001)
-            cur.execute(f"INSERT INTO hashes (hash, created_at) VALUES ('{generate_random_hash(db_config['HASH_SIZE'])}', '{datetime.now()}')")
+            cur.execute(f'SELECT * FROM hashes ORDER BY "created_at" DESC LIMIT 100')
             conn.commit()
         conn.close()
         return True
@@ -67,7 +49,7 @@ def mysql_write_hash(size: int = 100) -> bool:
 
 
 if __name__ == '__main__':
-    if mysql_write_hash(db_config['RECORDS']):
+    if mysql_read(db_config['RECORDS']):
         logging.info("Hashes successfully written to the database.")
     else:
         logging.error("Failed to write hashes to the database.")
