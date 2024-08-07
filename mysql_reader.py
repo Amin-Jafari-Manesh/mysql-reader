@@ -45,7 +45,7 @@ def mysql_read() -> bool:
 
 
 if __name__ == '__main__':
-    if mysql_read(db_config['RECORDS']):
+    if mysql_read():
         logging.info("Hashes successfully written to the database.")
     else:
         logging.error("Failed to write hashes to the database.")
