@@ -22,7 +22,7 @@ conn = mysql.connector.connect(
 
 
 def mysql_read() -> bool:
-    if conn.is_connected():
+    if conn and conn.is_connected():
         logging.info("Connected to the database.")
         cur = conn.cursor()
         if db_config['DATA_TYPE'] == 'h':
